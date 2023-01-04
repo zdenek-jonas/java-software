@@ -1,0 +1,12 @@
+INFO  2023-01-04 09:55:34.537 GMT-0500 [main] Tester - MicroStreamTester started successfully
+DEBUG 2023-01-04 09:55:34.548 GMT-0500 [http-nio-7779-exec-1] Tester - Updated state
+DEBUG 2023-01-04 09:55:34.548 GMT-0500 [http-nio-7779-exec-1] Tester - State data:
+DEBUG 2023-01-04 09:55:34.548 GMT-0500 [http-nio-7779-exec-1] Tester - key-1672843426954 => value-0.799215455188463
+DEBUG 2023-01-04 09:55:34.548 GMT-0500 [http-nio-7779-exec-1] Tester - key-1672844134535 => value-0.08318703641736691
+DEBUG 2023-01-04 09:55:34.548 GMT-0500 [http-nio-7779-exec-1] Tester - key-1672844108279 => value-0.060940299495395034
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - Updated state
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - State data:
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - key-1672844135713 => value-0.530137517319777
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - key-1672843426954 => value-0.799215455188463
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - key-1672844134535 => value-0.08318703641736691
+DEBUG 2023-01-04 09:55:35.714 GMT-0500 [http-nio-7779-exec-3] Tester - key-1672844108279 => value-0.060940299495395034

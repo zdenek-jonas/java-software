@@ -1,0 +1,17 @@
+logging:
+  level.org.springframework: TRACE
+  level.one.microstream: DEBUG
+  file:
+    path: logs
+    
+one.microstream:
+   storage-directory: ./stateData
+   backup-directory: ./stateDataBackup
+   channel-count: 4
+   housekeeping-interval: 300000 # 5 minutes
+   entity-cache-timeout: 31536000000 # 365 days
+   
+server:
+  port: 7779
+  ssl:
+    enabled: false

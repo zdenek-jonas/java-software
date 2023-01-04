@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.avaya.slate</groupId>
+        <artifactId>SlateParent</artifactId>
+        <version>7.2.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>microStreamTester</artifactId>
+    <name>MicroStream Tester</name>
+    <description>Testing MicroStream configuration in application.yml</description>
+
+    <properties>
+        <docker.image.name>resource-manager-api</docker.image.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>  
+            <groupId>org.springframework.boot</groupId>  
+            <artifactId>spring-boot-starter-hateoas</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <dependency>
+      		<groupId>one.microstream</groupId>
+	      	<artifactId>microstream-integrations-spring-boot</artifactId>
+	      	<version>07.01.00-MS-GA</version>
+	   </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>prepare-dockerfile</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <!-- filtering the Docker file so that
+                                        we can make use of the profile's properties + current version's jar-with-deps -->
+                                    <directory>src/main/docker</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/docker-tmp</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Configuration for "dockerfile-maven-plugin" -->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <verbose>true</verbose>
+                    <!-- creates an docker-image based on the Dockerfile -->
+                    <images>
+                        <image>
+                            <!-- define the image name and version -->
+                            <!-- %l: If the project version ends with -SNAPSHOT then this placeholder is latest, otherwise its the full version -->
+                            <name>${docker.image.name}:%l</name>
+                            <alias>${docker.image.name}</alias>
+                            <build>
+                                <cleanup>try</cleanup>
+                                <dockerFile>Dockerfile</dockerFile>
+                                <!-- we need to use this directory as we have the Dockerfile being filtered and copied there by the maven-resources-plugin plugin-->
+                                <dockerFileDir>${project.build.directory}/docker-tmp</dockerFileDir>
+
+                                <!-- copies local jar-with-dependencies -->
+                                <!-- into the docker-plugin "build-maven" directory -->
+                                <!-- path: ${project.basedir}/target/docker/xxx-image/build/maven/ -->
+                                <assembly>
+                                    <inline>
+                                        <id>copy-generated-jar-file</id>
+                                        <files>
+                                            <file>
+                                                <source>
+                                                    ${project.build.directory}/${project.artifactId}-${project.version}.jar
+                                                </source>
+                                                <outputDirectory>./</outputDirectory>
+                                                <destName>
+                                                    ${project.artifactId}-${project.version}.jar
+                                                </destName>
+                                            </file>
+                                            <file>
+                                                <source>${project.build.directory}/classes/docker_log4j.xml
+                                                </source>
+                                                <outputDirectory>./</outputDirectory>
+                                                <filtered>true</filtered>
+                                                <destName>docker_log4j.xml</destName>
+                                            </file>
+                                            <file>
+                                                <source>${project.build.directory}/classes/www_slateai_com.jks
+                                                </source>
+                                                <outputDirectory>./</outputDirectory>
+                                                <filtered>false</filtered>
+                                                <destName>www_slateai_com.jks</destName>
+                                            </file>
+                                        </files>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                    <!-- define the file to save the builded image -->
+                    <saveFile>${project.build.directory}/${docker.image.name}-docker-image.tar.gz</saveFile>
+                    <registry>${docker.registry}</registry>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
