@@ -6,12 +6,12 @@
 
 package com.avaya.microstream;
 
-import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import one.microstream.concurrency.XThreads;
-import one.microstream.storage.embedded.types.EmbeddedStorage;
 import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 
 @SpringBootApplication
@@ -30,10 +29,11 @@ import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 public class Tester implements CommandLineRunner 
 {
 	private static final Logger LOG = Logger.getLogger(Tester.class);
-	
-	private static final HashMap<String, String> STATE_DATA = new HashMap<>();
 
-	private EmbeddedStorageManager analysisStorageManager;
+	@Autowired
+	private EmbeddedStorageManager embeddedStorageManager;
+	
+	private StateData stateData;
 	
 	private class StateUpdater implements Runnable
 	{
@@ -49,17 +49,17 @@ public class Tester implements CommandLineRunner
 		@Override
 		public void run()
 		{
-			String value = STATE_DATA.get(keyField);
+			String value = stateData.getStateData().get(keyField);
 			
 			if (value == null)
 			{
-				STATE_DATA.put(keyField, valueField);
-				analysisStorageManager.storeRoot();
+				stateData.getStateData().put(keyField, valueField);
+				embeddedStorageManager.storeRoot();
 				LOG.debug("Updated state");
 			}
 			
 			LOG.debug("State data:");
-			for (Entry<String, String> oneEntry: STATE_DATA.entrySet())
+			for (Entry<String, String> oneEntry: stateData.getStateData().entrySet())
 				LOG.debug(oneEntry.getKey() + " => " + oneEntry.getValue());
 		}
 	}
@@ -67,8 +67,7 @@ public class Tester implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-		analysisStorageManager = EmbeddedStorage.start(STATE_DATA);
-		
+		stateData = (StateData)embeddedStorageManager.root();
 		LOG.info("MicroStreamTester started successfully");
 	}
 	
@@ -88,7 +87,7 @@ public class Tester implements CommandLineRunner
 	@PreDestroy
 	public void shutdown() 
 	{
-		analysisStorageManager.shutdown();
+		embeddedStorageManager.shutdown();
 	
 		LOG.info("MicroStreamTester shutting down");
 	}
