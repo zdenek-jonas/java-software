@@ -25,7 +25,6 @@ public class Tester implements CommandLineRunner
 	@Autowired
 	private EmbeddedStorageManager microStreamStorageManager;
 	
-	@Autowired
 	private StateData stateData;
 	
 	private class StateUpdater implements Runnable
@@ -60,6 +59,8 @@ public class Tester implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
+		stateData = (StateData) microStreamStorageManager.root();
+		
 		LOG.info("MicroStreamTester started successfully");
 	}
 	
