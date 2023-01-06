@@ -60,7 +60,6 @@ public class Tester implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-		microStreamStorageManager.start();
 		LOG.info("MicroStreamTester started successfully");
 	}
 	
