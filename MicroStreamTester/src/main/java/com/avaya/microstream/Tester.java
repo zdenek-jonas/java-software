@@ -23,7 +23,7 @@ public class Tester implements CommandLineRunner
 	private static final Logger LOG = Logger.getLogger(Tester.class);
 
 	@Autowired
-	private EmbeddedStorageManager embeddedStorageManager;
+	private EmbeddedStorageManager microStreamStorageManager;
 	
 	@Autowired
 	private StateData stateData;
@@ -47,7 +47,7 @@ public class Tester implements CommandLineRunner
 			if (value == null)
 			{
 				stateData.getStateData().put(keyField, valueField);
-				embeddedStorageManager.storeRoot();
+				microStreamStorageManager.storeRoot();
 				LOG.debug("Updated state");
 			}
 			
@@ -60,9 +60,7 @@ public class Tester implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-		//embeddedStorageManager = EmbeddedStorage.start(stateData);
-		embeddedStorageManager.setRoot(stateData);
-		LOG.debug("MicroStream object ID: " + embeddedStorageManager.storeRoot());
+		microStreamStorageManager.start();
 		LOG.info("MicroStreamTester started successfully");
 	}
 	
@@ -82,7 +80,7 @@ public class Tester implements CommandLineRunner
 	@PreDestroy
 	public void shutdown() 
 	{
-		embeddedStorageManager.shutdown();
+		microStreamStorageManager.shutdown();
 	
 		LOG.info("MicroStreamTester shutting down");
 	}
