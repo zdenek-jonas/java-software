@@ -1,9 +1,3 @@
-/*
- * 
- * @author Reinhard Klemm, Avaya
- * 
- */
-
 package com.avaya.microstream;
 
 import java.util.Map.Entry;
@@ -15,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +18,6 @@ import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 
 @SpringBootApplication
 @RestController
-@Configuration
 public class Tester implements CommandLineRunner 
 {
 	private static final Logger LOG = Logger.getLogger(Tester.class);
@@ -33,6 +25,7 @@ public class Tester implements CommandLineRunner
 	@Autowired
 	private EmbeddedStorageManager embeddedStorageManager;
 	
+	@Autowired
 	private StateData stateData;
 	
 	private class StateUpdater implements Runnable
@@ -67,7 +60,9 @@ public class Tester implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-		stateData = (StateData)embeddedStorageManager.root();
+		//embeddedStorageManager = EmbeddedStorage.start(stateData);
+		embeddedStorageManager.setRoot(stateData);
+		LOG.debug("MicroStream object ID: " + embeddedStorageManager.storeRoot());
 		LOG.info("MicroStreamTester started successfully");
 	}
 	
